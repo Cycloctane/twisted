@@ -2888,7 +2888,11 @@ class FTPClient(FTPClientBasic):
     connectFactory = reactor.connectTCP
 
     def __init__(
-        self, username="anonymous", password="twisted@twistedmatrix.com", passive=1
+        self,
+        username="anonymous",
+        password="twisted@twistedmatrix.com",
+        passive=1,
+        trust_server_pasv_ipv4_address=0,
     ):
         """
         Constructor.
@@ -2900,11 +2904,14 @@ class FTPClient(FTPClientBasic):
         @param passive: flag that controls if I use active or passive data
             connections.  You can also change this after construction by
             assigning to C{self.passive}.
+        @param trust_server_pasv_ipv4_address: flag that controls if the
+            address in the PASV response should be trusted.
         """
         FTPClientBasic.__init__(self)
         self.queueLogin(username, password)
 
         self.passive = passive
+        self.trust_server_pasv_ipv4_address = trust_server_pasv_ipv4_address
 
     def fail(self, error):
         """
@@ -2973,7 +2980,12 @@ class FTPClient(FTPClientBasic):
 
             def doPassive(response):
                 """Connect to the port specified in the response to PASV"""
-                host, port = decodeHostPort(response[-1][4:])
+                untrusted_host, port = decodeHostPort(response[-1][4:])
+
+                if self.trust_server_pasv_ipv4_address:
+                    host = untrusted_host
+                else:
+                    host = self.transport.getPeer().host
 
                 f = _PassiveConnectionFactory(protocol)
                 _mutable[0] = self.connectFactory(host, port, f)
