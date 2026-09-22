@@ -1,6 +1,6 @@
 twisted.protocols.ftp.FTPClient now uses ip of the original control connection peer to make passive data connections by default, instead of the one from PASV response.
 
-This prevent FTPClient from making unintended connections to hosts other than FTP server.
+This prevents FTPClient from making unintended connections to hosts other than FTP server.
 
 It also makes FTPClient compatible with some misconfigured FTP servers that mistakenly send their local address in PASV responses.
 
