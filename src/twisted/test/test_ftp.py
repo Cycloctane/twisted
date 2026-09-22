@@ -3019,7 +3019,7 @@ class FTPClientTests(TestCase):
         self.client.lineReceived(b"250 okay")
         return d.addCallback(self.assertTrue)
 
-    def test_passivePeerCheck(self):
+    def test_passiveRETRPeerCheck(self):
         def cbConnect(host, port, factory):
             self.assertEqual(host, "127.0.0.1")
             self.assertEqual(port, 12345)
@@ -3030,6 +3030,28 @@ class FTPClientTests(TestCase):
             )
             proto.connectionLost(failure.Failure(error.ConnectionDone("")))
 
+        self.client.connectFactory = cbConnect
+        self._testLogin()
+        d = self.client.retrieveFile("spam", _BufferingProtocol())
+        self.assertEqual(self.transport.value(), b"PASV\r\n")
+        self.transport.clear()
+        self.client.lineReceived(passivemode_msg(self.client, host="127.0.0.2"))
+        self.assertEqual(self.transport.value(), b"RETR spam\r\n")
+        self.client.lineReceived(b"226 Transfer Complete.")
+        return d
+
+    def test_passiveRETRNoPeerCheck(self):
+        def cbConnect(host, port, factory):
+            self.assertEqual(host, "127.0.0.2")
+            self.assertEqual(port, 12345)
+            proto = factory.buildProtocol((host, port))
+            proto.makeConnection(proto_helpers.StringTransport())
+            self.client.lineReceived(
+                b"150 File status okay; about to open data connection."
+            )
+            proto.connectionLost(failure.Failure(error.ConnectionDone("")))
+
+        self.client.peerCheck = 0
         self.client.connectFactory = cbConnect
         self._testLogin()
         d = self.client.retrieveFile("spam", _BufferingProtocol())
