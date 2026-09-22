@@ -4,4 +4,4 @@ This prevent FTPClient from making unintended connections to hosts other than FT
 
 It also makes FTPClient compatible with some misconfigured FTP servers that mistakenly send their local address in PASV responses.
 
-Users can set FTPClient(peerCheck=0) (default is 1) to preserce the previous behavior (trusting PASV responses).
+Users can set FTPClient(peerCheck=0) (default is 1) to preserve the previous behavior (trusting PASV responses).
