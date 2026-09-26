@@ -3024,6 +3024,7 @@ class FTPClientTests(TestCase):
         By default, client uses ip address of the original server for passive
         data connections, instead of trusting PASV responses.
         """
+
         def cbConnect(host, port, factory):
             self.assertEqual(host, "127.0.0.1")
             self.assertEqual(port, 12345)
@@ -3049,6 +3050,7 @@ class FTPClientTests(TestCase):
         When client explicitly disables checkPeerSourceIP, the ip address in PASV
         response is always used when opening passive data connections.
         """
+
         def cbConnect(host, port, factory):
             self.assertEqual(host, "127.0.0.2")
             self.assertEqual(port, 12345)
