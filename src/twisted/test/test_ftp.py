@@ -3051,7 +3051,7 @@ class FTPClientTests(TestCase):
             )
             proto.connectionLost(failure.Failure(error.ConnectionDone("")))
 
-        self.client._peerCheck = False
+        self.client._checkPeerSourceIP = False
         self.client.connectFactory = cbConnect
         self._testLogin()
         d = self.client.retrieveFile("spam", _BufferingProtocol())
