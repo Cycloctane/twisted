@@ -2892,7 +2892,7 @@ class FTPClient(FTPClientBasic):
         username="anonymous",
         password="twisted@twistedmatrix.com",
         passive=1,
-        peerCheck=1,
+        peerCheck=True,
     ):
         """
         Constructor.
@@ -2911,7 +2911,7 @@ class FTPClient(FTPClientBasic):
         self.queueLogin(username, password)
 
         self.passive = passive
-        self.peerCheck = peerCheck
+        self._peerCheck = peerCheck
 
     def fail(self, error):
         """
@@ -2980,12 +2980,12 @@ class FTPClient(FTPClientBasic):
 
             def doPassive(response):
                 """Connect to the port specified in the response to PASV"""
-                untrusted_host, port = decodeHostPort(response[-1][4:])
+                untrustedHost, port = decodeHostPort(response[-1][4:])
 
-                if self.peerCheck:
+                if self._peerCheck:
                     host = self.transport.getPeer().host
                 else:
-                    host = untrusted_host
+                    host = untrustedHost
 
                 f = _PassiveConnectionFactory(protocol)
                 _mutable[0] = self.connectFactory(host, port, f)
